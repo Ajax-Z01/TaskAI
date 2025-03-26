@@ -1,0 +1,22 @@
+# Virtual environment
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.db
+
+# FastAPI & SQLite
+instance/
+*.sqlite3
+*.sqlite
+
+# OS & Editor
+.DS_Store
+.vscode/
+.idea/
+
+# Node.js (jika frontend sudah dibuat)
+node_modules/
+*.log
+.next/
+.svelte-kit/

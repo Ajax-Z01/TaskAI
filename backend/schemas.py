@@ -1,15 +1,17 @@
 from pydantic import BaseModel
 
-class TaskBase(BaseModel):
+class TaskCreate(BaseModel):
     title: str
     description: str
     priority: int
 
-class TaskCreate(TaskBase):
-    pass
+class TaskUpdate(BaseModel):
+    title: str
+    description: str
+    priority: int
 
-class TaskResponse(TaskBase):
+class TaskResponse(BaseModel):
     id: int
-
-    class Config:
-        from_attributes = True
+    title: str
+    description: str
+    priority: int

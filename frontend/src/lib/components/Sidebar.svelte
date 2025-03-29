@@ -9,7 +9,7 @@
 	let nonActiveClass = 'flex items-center p-3 text-base font-normal text-gray-700 dark:text-gray-300 rounded-md hover:bg-primary-50 dark:hover:bg-gray-700 transition-all duration-300';
 </script>
 
-<Sidebar {activeUrl} {activeClass} {nonActiveClass} class="bg-white dark:bg-gray-900 shadow-md w-64 p-4 hidden md:flex flex-col">
+<Sidebar {activeUrl} {activeClass} {nonActiveClass} class="bg-white dark:bg-gray-900 shadow-md w-64 p-4 hidden md:flex flex-col border-r border-gray-300 dark:border-gray-700">
 	<SidebarWrapper divClass="bg-white dark:bg-gray-900">
 		<SidebarGroup>
 			<SidebarItem href="/" label="Dashboard">

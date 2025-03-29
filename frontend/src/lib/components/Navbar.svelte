@@ -9,7 +9,7 @@
     let nonActiveClass = 'text-gray-600 dark:text-gray-300 hover:text-primary-600 transition duration-300';
 </script>
 
-<Navbar class="bg-white dark:bg-gray-900 shadow-md px-4 py-3">
+<Navbar class="bg-white dark:bg-gray-900 shadow-md px-4 py-3 border-b border-gray-300 dark:border-gray-700">
     <NavBrand href="/" class="flex items-center space-x-2">
         <!-- <img src="/images/taskai-logo.svg" class="h-8 hidden md:block" alt="TaskAI Logo" /> -->
         <span class="text-2xl font-bold text-gray-800 dark:text-white">TaskAI</span>

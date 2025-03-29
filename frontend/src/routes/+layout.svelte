@@ -9,27 +9,8 @@
 	<Navbar />
 	<div class="content">
 		<Sidebar />
-		<main class="page">
+		<main class="page bg-gray-100 dark:bg-gray-800">
 			<slot />
 		</main>
 	</div>
 </div>
-
-<style>
-	.layout {
-		display: flex;
-		flex-direction: column;
-		height: 100vh;
-	}
-
-	.content {
-		display: flex;
-		flex: 1;
-	}
-
-	.page {
-		flex: 1;
-		padding: 1rem;
-		overflow-y: auto;
-	}
-</style>

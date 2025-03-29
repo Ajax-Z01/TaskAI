@@ -33,7 +33,7 @@ def get_task(task_id: int, db: Session = Depends(get_db)):
 # ✅ Add a new task
 @app.post("/tasks/", response_model=TaskResponse)
 def create_task(task: TaskCreate, db: Session = Depends(get_db)):
-    new_task = Task(title=task.title, description=task.description, priority=task.priority)
+    new_task = Task(title=task.title, description=task.description, priority=task.priority, status=task.status, progress=task.progress)
     db.add(new_task)
     db.commit()
     db.refresh(new_task)
@@ -50,6 +50,8 @@ def update_task(task_id: int, task_update: TaskUpdate, db: Session = Depends(get
     task.title = task_update.title
     task.description = task_update.description
     task.priority = task_update.priority
+    task.status = task_update.status
+    task.progress = task_update.progress
 
     db.commit()
     db.refresh(task)

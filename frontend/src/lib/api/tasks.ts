@@ -16,7 +16,7 @@ export async function fetchTaskById(id: string) {
     return await res.json();
 }
 
-export async function createTask(task: { title: string; description: string; priority: number }) {
+export async function createTask(task: { title: string; description: string; priority: number, status: string, progress: number }) {
     const res = await fetch(`${API_URL}/tasks/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -28,8 +28,8 @@ export async function createTask(task: { title: string; description: string; pri
     return res.json();
 }
 
-export async function getAIRecommendations() {
-    const res = await fetch(`${API_URL}/tasks/recommendations/`);
+export async function getAIRecommendations(mode: string = "urgent") {
+    const res = await fetch(`${API_URL}/tasks/recommendations/?mode=${mode}`);
     if (!res.ok) {
         throw new Error("Failed to fetch recommendations");
     }

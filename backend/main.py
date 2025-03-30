@@ -5,6 +5,7 @@ from models import Task
 from schemas import TaskCreate, TaskResponse, TaskUpdate
 from ai import recommend_tasks
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import Query
 
 app = FastAPI()
 init_db()
@@ -70,6 +71,8 @@ def delete_task(task_id: int, db: Session = Depends(get_db)):
 
 # ✅ Get recommended tasks (ignoring deleted tasks)
 @app.get("/tasks/recommendations/", response_model=list[TaskResponse])
-def get_recommendations(db: Session = Depends(get_db)):
+def get_recommendations(mode: str = "urgent", db: Session = Depends(get_db)):
     tasks = db.query(Task).filter(Task.is_deleted == False).all()
-    return recommend_tasks(tasks)
+    recommended_tasks = recommend_tasks(tasks, mode=mode)
+
+    return [TaskResponse.from_orm(task) for task in recommended_tasks]

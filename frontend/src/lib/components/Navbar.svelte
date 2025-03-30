@@ -11,7 +11,7 @@
 
 <Navbar class="bg-white dark:bg-gray-900 shadow-md px-4 py-3 border-b border-gray-300 dark:border-gray-700">
     <NavBrand href="/" class="flex items-center space-x-2">
-        <!-- <img src="/images/taskai-logo.svg" class="h-8 hidden md:block" alt="TaskAI Logo" /> -->
+        <img src="/images/taskai-logo.svg" class="h-10 hidden md:block invert-0 dark:invert-100" alt="TaskAI Logo" />
         <span class="text-2xl font-bold text-gray-800 dark:text-white">TaskAI</span>
     </NavBrand>
     
@@ -46,7 +46,7 @@
         </DropdownItem>
     </Dropdown>    
 
-    <NavUl {activeUrl} {activeClass} {nonActiveClass} class="hidden md:flex space-x-6">
+    <NavUl {activeUrl} {activeClass} {nonActiveClass} class="md:flex space-x-6 cursor-pointer">
         <NavLi href="/">
             Home
         </NavLi>

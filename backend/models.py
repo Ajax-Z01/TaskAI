@@ -11,8 +11,8 @@ class Task(Base):
     description = Column(String, nullable=False)
     priority = Column(Integer, default=1, nullable=False)
     
-    status = Column(String, default="Pending", nullable=False)  # Status: Pending, In Progress, Completed
-    progress = Column(Integer, default=0, nullable=False)  # Progress dalam persen (0-100)
+    status = Column(String, default="Pending", nullable=False)
+    progress = Column(Integer, default=0, nullable=False)
     
     created_at = Column(DateTime, server_default=func.now())
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())

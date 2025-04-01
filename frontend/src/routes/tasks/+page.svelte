@@ -6,6 +6,8 @@
     import { Modal, Progressbar } from 'flowbite-svelte';
     import TaskRecommendation from "$lib/components/TaskRecommendation.svelte";
     import { PlusOutline } from "flowbite-svelte-icons";
+	import ViewDetailsButton from "$lib/components/ViewDetailsButton.svelte";
+	import { goto } from "$app/navigation";
     
 	const dispatch = createEventDispatcher();
 
@@ -176,21 +178,24 @@
     {:else}
         <div class="grid gap-4">
             {#each filteredTasks as task (task.id)}
-                <div class="relative p-4 bg-white dark:bg-gray-900 shadow-md rounded-lg flex flex-col gap-2 transition hover:shadow-lg">
+                <div class="relative p-4 bg-white dark:bg-gray-900 shadow-md rounded-lg flex flex-col gap-3 transition hover:shadow-lg hover:-translate-y-1">
+                    <!-- Priority Label -->
                     <span 
-                        class="absolute top-5 right-4 px-3 py-1 text-white text-xs font-semibold rounded-full"
+                        class="absolute top-4 right-4 px-3 py-1 text-white text-xs font-semibold rounded-full"
                         class:bg-red-500={task.priority === 1}
                         class:bg-yellow-500={task.priority === 2}
                         class:bg-green-500={task.priority === 3}>
                         {task.priority === 1 ? "High" : task.priority === 2 ? "Medium" : "Low"}
                     </span>
 
+                    <!-- Task Title -->
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">{task.title}</h3>
-                    <p class="text-gray-600 dark:text-gray-300">{task.description}</p>
+                    <p class="text-gray-600 dark:text-gray-300 text-sm">{task.description}</p>
 
-                    <div class="flex items-center gap-2">
+                    <!-- Status & Progress -->
+                    <div class="flex items-center gap-3">
                         <span 
-                            class="px-3 py-1 rounded-full text-white text-sm font-medium whitespace-nowrap"
+                            class="px-3 py-1 rounded-full text-white text-xs font-medium whitespace-nowrap"
                             class:bg-green-500={task.status === 'Completed'}
                             class:bg-blue-500={task.status === 'In Progress'}
                             class:bg-yellow-500={task.status === 'Pending'}>
@@ -198,6 +203,11 @@
                         </span>
 
                         <Progressbar progress={task.progress} size="h-4" class="w-full" />
+                    </div>
+
+                    <!-- View Details Button -->
+                    <div class="flex justify-end">
+                        <ViewDetailsButton taskId={task.id} />
                     </div>
                 </div>
             {/each}

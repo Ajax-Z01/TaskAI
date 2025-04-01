@@ -9,7 +9,7 @@ export async function fetchTasks() {
 }
 
 export async function fetchTaskById(id: string) {
-    const res = await fetch(`http://127.0.0.1:8000/tasks/${id}`);
+    const res = await fetch(`${API_URL}/tasks/${id}`);
     if (!res.ok) {
         throw new Error("Failed to fetch task details");
     }
@@ -26,6 +26,28 @@ export async function createTask(task: { title: string; description: string; pri
         throw new Error("Failed to create task");
     }
     return res.json();
+}
+
+export async function updateTask(id: number, updates: Partial<{ title: string; description: string; priority: number; status: string; progress: number }>) {
+    const res = await fetch(`${API_URL}/tasks/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+    });
+    if (!res.ok) {
+        throw new Error("Failed to update task");
+    }
+    return res.json();
+}
+
+export async function deleteTask(id: number) {
+    const res = await fetch(`${API_URL}/tasks/${id}`, {
+        method: "DELETE"
+    });
+    if (!res.ok) {
+        throw new Error("Failed to delete task");
+    }
+    return { success: true };
 }
 
 export async function getAIRecommendations(mode: string = "urgent") {

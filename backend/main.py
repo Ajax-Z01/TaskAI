@@ -5,7 +5,6 @@ from models import Task
 from schemas import TaskCreate, TaskResponse, TaskUpdate
 from ai import recommend_tasks
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import Query
 
 app = FastAPI()
 init_db()

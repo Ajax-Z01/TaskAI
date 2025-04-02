@@ -3,11 +3,10 @@
     import { onMount } from "svelte";
     import { fetchTasks, createTask, getAIRecommendations } from "$lib/api/tasks";
     import type { Task } from "$lib/types/task";
-    import { Modal, Progressbar } from 'flowbite-svelte';
+    import { Input, Label, Modal, Progressbar, Select } from 'flowbite-svelte';
     import TaskRecommendation from "$lib/components/TaskRecommendation.svelte";
-    import { PlusOutline } from "flowbite-svelte-icons";
+    import { CirclePlusSolid } from "flowbite-svelte-icons";
 	import ViewDetailsButton from "$lib/components/ViewDetailsButton.svelte";
-	import { goto } from "$app/navigation";
     
 	const dispatch = createEventDispatcher();
 
@@ -29,6 +28,17 @@
     let status = "Pending";
     let progress = 0;
     let loading = true;
+    let priorities = [
+        { value: 1, name: "Low" },
+        { value: 2, name: "Medium" },
+        { value: 3, name: "High" }
+    ];
+
+    let statuses = [
+        { value: "Pending", name: "Pending" },
+        { value: "In Progress", name: "In Progress" },
+        { value: "Completed", name: "Completed" }
+    ];
     
     async function addTask() {
         try {
@@ -71,10 +81,6 @@
             loading = false;
         }
     }
-    
-    function closeModal() {
-		dispatch("close");
-	}
 
     function applyFilters() {
         let tempTasks = [...tasks];
@@ -158,12 +164,12 @@
             </select>
 
             <button on:click={() => { sortOrder = sortOrder === "asc" ? "desc" : "asc"; applyFilters(); }}
-                class="p-2 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition w-full sm:w-auto">
+                class="p-2 text-sm text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 duration-200 ease-in-out rounded-lg shadow-md cursor-pointer transition w-full sm:w-auto">
                 {sortOrder === "asc" ? "▲ Asc" : "▼ Desc"}
             </button>
 
-            <button class="flex justify-center p-2 text-sm bg-green-500 text-white rounded-lg hover:bg-green-600 transition w-full sm:w-auto" on:click={() => showModal = true}>
-                <PlusOutline/> 
+            <button class="flex justify-center p-2 text-white bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 transition duration-200 ease-in-out rounded-lg shadow-md cursor-pointer w-full sm:w-auto" on:click={() => showModal = true}>
+                <CirclePlusSolid class="w-5 h-5 mt-1 mr-1"/> 
                 <span>Add Task</span>
             </button>
         </div>
@@ -215,35 +221,36 @@
     {/if}
 </section>
 
-<Modal bind:open={showModal} on:close={closeModal}>
+<Modal bind:open={showModal} autoclose outsideclose >
     <div>
         <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-200">Add New Task</h2>
         <form class="space-y-4 mt-4" on:submit|preventDefault={addTask}>
-            <input type="text" bind:value={title} placeholder="Title" 
-                class="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-white" required />
+            <Label>Title
+                <Input type="text" bind:value={title} placeholder="Title" class="mt-2 w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-white" required />
+            </Label>
 
-            <input type="text" bind:value={description} placeholder="Description" 
-                class="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-white" required />
+            <Label>Description
+                <Input type="text" bind:value={description} placeholder="Description" class="mt-2 w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-white" required />
+            </Label>
 
-            <select bind:value={priority} 
-                class="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-white">
-                <option value="1">Low</option>
-                <option value="2">Medium</option>
-                <option value="3">High</option>
-            </select>
+            <Label>Priority
+                <Select bind:value={priority} items={priorities} class="mt-2 w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-white"/>
+            </Label>
 
-            <select bind:value={status} 
-                class="w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-white">
-                <option value="Pending">Pending</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Completed">Completed</option>
-            </select>
+            <Label>Status
+                <Select bind:value={status} items={statuses} class="mt-2 w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-white"/>
+            </Label>
 
-            <div>
-                <label class="block text-sm text-gray-600 dark:text-gray-300">Progress: {progress}%
+            <div class="relative mb-8">
+                <Label>Progress: {progress}%
                     <input type="range" min="0" max="100" step="1" bind:value={progress} 
-                    class="w-full cursor-pointer accent-blue-500" />
-                </label>
+                    class="mt-2 w-full cursor-pointer accent-primary-600" />
+                </Label>
+                <span class="text-sm text-gray-500 dark:text-gray-400 absolute start-0 -bottom-6">0%</span>
+                <span class="text-sm text-gray-500 dark:text-gray-400 absolute start-1/4 -translate-x-1/4 rtl:translate-x-1/2 -bottom-6">25%</span>
+                <span class="text-sm text-gray-500 dark:text-gray-400 absolute start-1/2 -translate-x-1/2 rtl:translate-x-1/2 -bottom-6">50%</span>
+                <span class="text-sm text-gray-500 dark:text-gray-400 absolute start-3/4 -translate-x-1/2 rtl:translate-x-1/4 -bottom-6">75%</span>
+                <span class="text-sm text-gray-500 dark:text-gray-400 absolute end-0 -bottom-6">100%</span>
             </div>
 
             <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition">

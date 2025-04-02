@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Card, Progressbar } from 'flowbite-svelte';
-	import { ClipboardListSolid, CheckCircleSolid, ClockSolid } from 'flowbite-svelte-icons';
+	import { ClipboardListSolid, CheckCircleSolid, ClockSolid, ForwardStepSolid } from 'flowbite-svelte-icons';
 	import TableRecentTasks from '$lib/components/TableRecentTask.svelte';
 	import { onMount } from 'svelte';
 	import { fetchTasks } from '$lib/api/tasks';
@@ -11,6 +11,7 @@
 	let totalTasks = 0;
 	let completedTasks = 0;
 	let pendingTasks = 0;
+	let inProgressTasks = 0;
 	let progressPercentage = 0;
 
 	async function loadTasks() {
@@ -25,6 +26,7 @@
 			totalTasks = items.length;
 			completedTasks = items.filter(t => t.status === "Completed").length;
 			pendingTasks = items.filter(t => t.status === "Pending").length;
+			inProgressTasks = items.filter(t => t.status === "In Progress").length;
 			progressPercentage = totalTasks > 0 ? Math.floor((completedTasks / totalTasks) * 100) : 0;
 
 		} catch (error) {
@@ -35,12 +37,11 @@
 	onMount(loadTasks);
 </script>
 
-
-<section class="grid gap-6 md:grid-cols-2 lg:grid-cols-3 p-4">
+<section class="grid gap-6 md:grid-cols-2 lg:grid-cols-4 p-4">
 	<!-- Title and Message -->
 	<div class="col-span-full">
 		<h1 class="text-2xl font-bold text-gray-800 dark:text-white">{title}</h1>
-		<p class="text-gray-600 dark:text-gray-300">Here is your item overview.</p>
+		<p class="text-gray-600 dark:text-gray-300">Here is your task overview.</p>
 	</div>
 	
 	<!-- Card Total Tasks -->
@@ -60,12 +61,21 @@
 			<p class="text-3xl font-bold text-gray-800 dark:text-white">{completedTasks}</p>
 		</div>
 	</Card>
+	
+	<!-- Card In Progress Tasks -->
+	<Card class="shadow-md border border-gray-200 dark:border-gray-700 flex items-center p-4 space-x-4">
+		<ForwardStepSolid class="w-10 h-10 text-yellow-500 ml-4" />
+		<div class="flex flex-col items-center">
+			<h5 class="text-lg font-semibold text-yellow-500">In Progress Tasks</h5>
+			<p class="text-3xl font-bold text-gray-800 dark:text-white">{inProgressTasks}</p>
+		</div>
+	</Card>
 
 	<!-- Card Pending Tasks -->
 	<Card class="shadow-md border border-gray-200 dark:border-gray-700 flex items-center p-4 space-x-4">
-		<ClockSolid class="w-10 h-10 text-yellow-500 ml-4" />
+		<ClockSolid class="w-10 h-10 text-primary-500 ml-4" />
 		<div class="flex flex-col items-center">
-			<h5 class="text-lg font-semibold text-yellow-500">Pending Tasks</h5>
+			<h5 class="text-lg font-semibold text-primary-500">Pending Tasks</h5>
 			<p class="text-3xl font-bold text-gray-800 dark:text-white">{pendingTasks}</p>
 		</div>
 	</Card>

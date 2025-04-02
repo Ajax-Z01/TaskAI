@@ -51,28 +51,29 @@
 </script>
 
 <div class="flex flex-col-reverse sm:flex-row sm:absolute sm:top-8 sm:right-4 gap-2">
-    <Button color="primary" class="hover:scale-105 transition">
+    <Button color="primary" class="hover:scale-105 transition cursor-pointer">
         Get AI Recommendations<ChevronDownOutline class="w-6 h-6 ms-2 text-white dark:text-white" />
     </Button>
 	<Dropdown bind:open={dropdownOpen}>
-		<div slot="header" class="px-2 py-2">
-			<Button onclick={fetchRecommendations} color="blue" class="flex items-center gap-2 w-full">
+		<div slot="header" class="px-2 py-2 text-center">
+			<h3 class="text-lg font-bold text-gray-800 dark:text-gray-200">Select AI Mode</h3>
+			<p class="text-sm font-semibold text-gray-800 dark:text-gray-200">
 				{#each modes as mode}
 					{#if mode.key === selectedMode}
 						{mode.label}
 					{/if}
 				{/each}
-			</Button>
+			</p>
 		</div>
         
         {#each modes as mode}
-            <DropdownItem on:click={() => selectMode(mode.key) }>
+            <DropdownItem on:click={() => selectMode(mode.key) } class="cursor-pointer">
                 {mode.label}
             </DropdownItem>
         {/each}
 		
 		<div slot="footer" class="px-2 py-2">
-			<Button onclick={fetchRecommendations} color="green" class="flex items-center gap-2 w-full">
+			<Button onclick={fetchRecommendations} color="green" class="flex items-center gap-2 w-full text-white bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 transition duration-200 ease-in-out rounded-lg shadow-md cursor-pointer">
 				Run AI Recommendations
 			</Button>
 		</div>

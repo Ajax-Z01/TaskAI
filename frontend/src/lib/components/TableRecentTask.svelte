@@ -26,14 +26,18 @@
 
 <Table>
     <TableHead>
+        <TableHeadCell>Date</TableHeadCell>
         <TableHeadCell>Task</TableHeadCell>
+        <TableHeadCell>Priority</TableHeadCell>
         <TableHeadCell>Status</TableHeadCell>
         <TableHeadCell>Progress</TableHeadCell>
     </TableHead>
     <TableBody tableBodyClass="divide-y">
         {#each items as item (item.id)}
             <TableBodyRow>
+                <TableBodyCell class="p-3">{new Date(item.created_at).toLocaleDateString()}</TableBodyCell>
                 <TableBodyCell class="p-3">{item.title}</TableBodyCell>
+                <TableBodyCell class="p-3">{item.priority === 1 ? "High" : item.priority === 2 ? "Medium" : "Low"}</TableBodyCell>
                 <TableBodyCell class="p-3">{item.status}</TableBodyCell>
                 <TableBodyCell class="p-3">
                     <Progressbar progress={item.progress} />

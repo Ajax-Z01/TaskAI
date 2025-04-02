@@ -1,62 +1,73 @@
-### 📌 **TaskAI: Task Manager with Smart AI Recommendations**  
+# TaskAI
 
-TaskAI adalah aplikasi manajemen tugas dengan fitur AI yang membantu mengatur urutan tugas berdasarkan prioritas.  
+TaskAI is a task management application that leverages artificial intelligence to suggest task prioritization. The application is built using **FastAPI** for the backend and **SvelteKit** for the frontend.
 
-## **🚀 Fitur Utama**  
-✔️ Tambah, edit, hapus tugas dengan mudah  
-✔️ AI merekomendasikan urutan tugas berdasarkan prioritas menggunakan **sentence-transformers**  
-✔️ Penyimpanan data menggunakan **SQLite**  
-✔️ API berbasis **FastAPI** untuk kinerja cepat dan ringan  
-✔️ (Opsional) UI berbasis **SvelteKit**  
+## 🚀 Key Features
+- **Task Management:** Create, edit, delete, and mark tasks as completed.
+- **AI Recommendations:** An AI-powered algorithm suggests task order based on priority.
+- **Interactive Dashboard:** A modern UI for easy task management.
+- **Flexible Settings:** Dark/light theme, user preferences, and more (coming soon).
 
-## **📂 Struktur Folder**  
+## 📂 Project Structure
 ```
 TaskAI/
-│── backend/               # Backend menggunakan FastAPI
-│   ├── main.py            # Entry point FastAPI
-│   ├── models.py          # ORM Model untuk SQLite
-│   ├── ai.py              # Model AI untuk rekomendasi tugas
-│   ├── database.py        # Koneksi database SQLite
-│── frontend/              # (Opsional) Frontend menggunakan SvelteKit
-│── requirements.txt       # Dependensi Python
-│── README.md              # Dokumentasi proyek
+├── backend/               # Backend using FastAPI
+│   ├── main.py            # Main entry point for FastAPI
+│   ├── models.py          # ORM model definitions (SQLAlchemy)
+│   ├── ai.py              # AI model for task recommendations
+│   ├── database.py        # Database connection and configuration
+│   └── requirements.txt   # Python dependencies
+├── frontend/              # Frontend using SvelteKit
+│   ├── src/
+│   │   ├── routes/        # Application pages and navigation
+│   │   ├── lib/           # Utility functions and shared modules
+│   │   ├── styles/        # Global and component-specific styles
+│   ├── static/            # Static assets (favicon, images, etc.)
+│   ├── package.json       # Project configuration and Node.js dependencies
+│   ├── svelte.config.js   # SvelteKit configuration
+│   ├── vite.config.js     # Vite configuration
+└── README.md              # Project documentation
 ```
 
-## **⚡ Instalasi & Menjalankan Backend**  
-Pastikan **Python 3.9+** sudah terinstal.  
+## 🔧 How to Run the Project
 
-1️⃣ **Clone repo ini**  
-```bash
+### 1. Running the Backend (FastAPI)
+```sh
 git clone https://github.com/Ajax-Z01/TaskAI.git
 cd TaskAI/backend
-```
 
-2️⃣ **Buat virtual environment (opsional, tapi direkomendasikan)**  
-```bash
+# Create a virtual environment (optional)
 python -m venv venv
-source venv/bin/activate  # Untuk Mac/Linux
-venv\Scripts\activate     # Untuk Windows
-```
+source venv/bin/activate  # For Mac/Linux
+venv\Scripts\activate     # For Windows
 
-3️⃣ **Instal dependensi**  
-```bash
+# Install dependencies
 pip install -r requirements.txt
-```
 
-4️⃣ **Jalankan server FastAPI**  
-```bash
+# Run FastAPI server
 uvicorn main:app --reload
 ```
 
-API akan berjalan di `http://127.0.0.1:8000`  
+### 2. Running the Frontend (SvelteKit)
+```sh
+cd TaskAI/frontend
 
-## **🌍 Rencana Pengembangan**  
-- [x] Backend API dengan FastAPI  
-- [x] AI rekomendasi tugas menggunakan `sentence-transformers`  
-- [ ] Frontend dashboard dengan SvelteKit  
-- [ ] Autentikasi pengguna  
+# Install dependencies
+npm install
 
-## **📜 Lisensi**  
-MIT License  
+# Start development server
+npm run dev
+```
 
----
+The application will be available at **http://localhost:5173/** (frontend) and **http://localhost:8000/** (backend).
+
+## 📌 Roadmap
+- [x] FastAPI backend for CRUD task management
+- [x] AI model for task prioritization
+- [x] Initial frontend setup with SvelteKit
+- [x] Task detail page
+- [ ] Application settings (theme, preferences, etc.)
+- [ ] UI/UX improvements
+
+## 💡 Contribution
+If you would like to contribute, feel free to fork this repository and submit a pull request. All feedback and suggestions are welcome!

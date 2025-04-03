@@ -27,3 +27,31 @@ class TaskResponse(BaseModel):
     
     class Config:
         from_attributes = True
+
+class CommentCreate(BaseModel):
+    task_id: int
+    content: str
+
+class CommentResponse(BaseModel):
+    id: int
+    task_id: int
+    content: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+class AttachmentCreate(BaseModel):
+    task_id: int
+    file_name: str
+    file_url: str
+
+class AttachmentResponse(BaseModel):
+    id: int
+    task_id: int
+    file_name: str
+    file_url: str
+    uploaded_at: datetime
+
+    class Config:
+        from_attributes = True

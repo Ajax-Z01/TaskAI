@@ -2,7 +2,7 @@
     import { Chart, Card, Button, Dropdown, DropdownItem, Popover, Tooltip } from 'flowbite-svelte';
     import { InfoCircleSolid, ChevronDownOutline, ChevronRightOutline, ArrowDownToBracketOutline } from 'flowbite-svelte-icons';
     import type { ApexOptions } from "apexcharts";
-    import type { Task } from "$lib/types/task";
+    import type { Task } from "$lib/types/task/task";
     import { fetchTasks } from "$lib/api/tasks";
     import { onMount } from 'svelte';
 

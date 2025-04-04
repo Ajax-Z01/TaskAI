@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { Task } from "$lib/types/task";
+    import type { Task } from "$lib/types/task/task";
 
     export let task: Task;
 </script>

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Progressbar, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
-	import type { Task } from "$lib/types/task";
+	import type { Task } from "$lib/types/task/task";
 	import { onMount } from "svelte";
 	import { fetchTasks } from "$lib/api/tasks";
 

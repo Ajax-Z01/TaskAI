@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createEventDispatcher } from "svelte";
-	import type { Task } from "$lib/types/task";
+	import type { Task } from "$lib/types/task/task";
 	import { Modal, Button, Progressbar, Dropdown, DropdownItem } from "flowbite-svelte";
 	import { ChevronDownOutline } from 'flowbite-svelte-icons';
 

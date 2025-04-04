@@ -1,120 +1,113 @@
 <script lang="ts">
-	import { createEventDispatcher } from "svelte";
-    import { onMount } from "svelte";
-    import { fetchTasks, createTask, getAIRecommendations } from "$lib/api/tasks";
-    import type { Task } from "$lib/types/task";
-    import { Input, Label, Modal, Progressbar, Select } from 'flowbite-svelte';
-    import TaskRecommendation from "$lib/components/TaskRecommendation.svelte";
-    import { CirclePlusSolid } from "flowbite-svelte-icons";
+	import { onMount } from "svelte";
+	import { fetchTasks, createTask, getAIRecommendations } from "$lib/api/tasks";
+	import type { Task } from "$lib/types/task/task";
+	import { CirclePlusSolid } from "flowbite-svelte-icons";
+	import TaskRecommendation from "$lib/components/TaskRecommendation.svelte";
 	import ViewDetailsButton from "$lib/components/ViewDetailsButton.svelte";
-    
-	const dispatch = createEventDispatcher();
+	import { Button, Input, Label, Modal, Progressbar, Select } from "flowbite-svelte";
 
-    let tasks: Task[] = [];
-    let filteredTasks: Task[] = [];
-    let recommendations: Task[] = [];
-    
-    let sortBy = "title";
-    let sortOrder = "asc";
-    let filterStatus = "All";
+	let tasks: Task[] = [];
+	let filteredTasks: Task[] = [];
+	let recommendations: Task[] = [];
 
-    let showModal = false;
-    let showRecommendationModal = false;
-    let loadingRecommendations = false;
-    let selectedMode = "";
-    let title = "";
-    let description = "";
-    let priority = 1;
-    let status = "Pending";
-    let progress = 0;
-    let loading = true;
-    let priorities = [
-        { value: 1, name: "Low" },
-        { value: 2, name: "Medium" },
-        { value: 3, name: "High" }
-    ];
+	let sortBy = "title";
+	let sortOrder = "asc";
+	let filterStatus = "All";
 
-    let statuses = [
-        { value: "Pending", name: "Pending" },
-        { value: "In Progress", name: "In Progress" },
-        { value: "Completed", name: "Completed" }
-    ];
+	let showModal = false;
+	let showRecommendationModal = false;
+	let loadingRecommendations = false;
+	let selectedMode = "";
+	let loading = true;
+
+	let title = "";
+	let description = "";
+	let priority = 1;
+	let status = "Pending";
+	let progress = 0;
+
+	const priorities = [
+		{ value: 1, name: "Low" },
+		{ value: 2, name: "Medium" },
+		{ value: 3, name: "High" }
+	];
+
+	const statuses = [
+		{ value: "Pending", name: "Pending" },
+		{ value: "In Progress", name: "In Progress" },
+		{ value: "Completed", name: "Completed" }
+	];
     
-    async function addTask() {
-        try {
-            await createTask({ title, description, priority, status, progress });
-            tasks = await fetchTasks();
-            title = "";
-            description = "";
-            priority = 1;
-            status = "Pending";
-            progress = 0;
-            applyFilters();
-            showModal = false;
-        } catch (error) {
-            console.error("Error adding task:", error);
-        }
+    function handleSubmitClick(event?: Event) {
+        event?.stopPropagation();
     }
 
-    async function fetchRecommendations(event: Event) {
-        const customEvent = event as CustomEvent<{ mode: string }>;
-        try {
-            loadingRecommendations = true;
-            selectedMode = customEvent.detail?.mode || "unknown";
-            recommendations = await getAIRecommendations(selectedMode);
-            showRecommendationModal = true;
-        } catch (error) {
-            console.error("Error fetching AI recommendations:", error);
-        } finally {
-            loadingRecommendations = false;
-        }
+	async function addTask(event?: Event) {
+		const form = (event?.target as HTMLElement)?.closest("form") as HTMLFormElement;
+		if (form && !form.checkValidity()) return form.reportValidity();
 
-    }
+		try {
+			await createTask({ title, description, priority, status, progress, attachments: [] });
+			await loadTasks();
+			resetForm();
+			showModal = false;
+		} catch (error) {
+			console.error("Error adding task:", error);
+		}
+	}
 
-    async function fetchData() {
-        try {
-            tasks = await fetchTasks();
-            applyFilters();
-        } catch (error) {
-            console.error("Error fetching tasks:", error);
-        } finally {
-            loading = false;
-        }
-    }
+	async function fetchRecommendations(event: CustomEvent<{ mode: string }>) {
+		try {
+			loadingRecommendations = true;
+			selectedMode = event.detail.mode;
+			recommendations = await getAIRecommendations(selectedMode);
+			showRecommendationModal = true;
+		} catch (error) {
+			console.error("Error fetching AI recommendations:", error);
+		} finally {
+			loadingRecommendations = false;
+		}
+	}
 
-    function applyFilters() {
-        let tempTasks = [...tasks];
+	async function loadTasks() {
+		try {
+			tasks = await fetchTasks();
+			applyFilters();
+		} catch (error) {
+			console.error("Error fetching tasks:", error);
+		} finally {
+			loading = false;
+		}
+	}
 
-        if (filterStatus !== "All") {
-            tempTasks = tempTasks.filter(task => task.status === filterStatus);
-        }
+	function resetForm() {
+		title = "";
+		description = "";
+		priority = 1;
+		status = "Pending";
+		progress = 0;
+	}
 
-        tempTasks.sort((a, b) => {
-            if (sortBy === "title") {
-                return sortOrder === "asc"
-                    ? a.title.localeCompare(b.title)
-                    : b.title.localeCompare(a.title);
-            }
-            if (sortBy === "priority") {
-                return sortOrder === "asc" ? a.priority - b.priority : b.priority - a.priority;
-            }
-            if (sortBy === "progress") {
-                return sortOrder === "asc" ? a.progress - b.progress : b.progress - a.progress;
-            }
-            return 0;
-        });
+	function applyFilters() {
+		filteredTasks = [...tasks]
+			.filter(task => filterStatus === "All" || task.status === filterStatus)
+			.sort((a, b) => {
+				if (sortBy === "title") {
+					return sortOrder === "asc"
+						? a.title.localeCompare(b.title)
+						: b.title.localeCompare(a.title);
+				}
+				if (sortBy === "priority") return sortOrder === "asc" ? a.priority - b.priority : b.priority - a.priority;
+				if (sortBy === "progress") return sortOrder === "asc" ? a.progress - b.progress : b.progress - a.progress;
+				return 0;
+			});
+	}
 
-        filteredTasks = tempTasks;
-    }
-
-    onMount(fetchData);
-    
-    onMount(() => {
-        const event = new CustomEvent("recommendations", { 
-            detail: { mode: "urgent" } 
-        });
-        window.dispatchEvent(event);
-    });
+	onMount(() => {
+		loadTasks();
+		window.dispatchEvent(new CustomEvent("recommendations", { detail: { mode: "urgent" } }));
+	});
 </script>
 
 <section class="relative grid md:grid-cols-2 lg:grid-cols-3 p-4">
@@ -221,7 +214,7 @@
     {/if}
 </section>
 
-<Modal bind:open={showModal} autoclose outsideclose >
+<Modal bind:open={showModal} autoclose outsideclose>
     <div>
         <h2 class="text-xl font-semibold text-gray-700 dark:text-gray-200">Add New Task</h2>
         <form class="space-y-4 mt-4" on:submit|preventDefault={addTask}>
@@ -253,13 +246,12 @@
                 <span class="text-sm text-gray-500 dark:text-gray-400 absolute end-0 -bottom-6">100%</span>
             </div>
 
-            <button type="submit" class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition">
-                Add Task
-            </button>
-            <button type="button" class="w-full bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition"
-                on:click={() => showModal = false}>
-                Cancel
-            </button>
+            <div class="w-full flex justify-end gap-4">
+                <Button type="submit" on:click={handleSubmitClick} class="text-white bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 transition duration-200 ease-in-out rounded-lg shadow-md cursor-pointer">Add Task</Button>
+                <Button on:click={() => showModal = false} class="text-white bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 transition duration-200 ease-in-out rounded-lg shadow-md cursor-pointer">
+                    Cancel
+                </Button>
+            </div>
         </form>
     </div>
 </Modal>

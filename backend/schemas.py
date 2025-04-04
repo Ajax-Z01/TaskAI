@@ -29,7 +29,6 @@ class TaskResponse(BaseModel):
         from_attributes = True
 
 class CommentCreate(BaseModel):
-    task_id: int
     content: str
 
 class CommentResponse(BaseModel):
@@ -42,7 +41,6 @@ class CommentResponse(BaseModel):
         from_attributes = True
 
 class AttachmentCreate(BaseModel):
-    task_id: int
     file_name: str
     file_url: str
 

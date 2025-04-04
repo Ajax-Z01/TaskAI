@@ -1,59 +1,55 @@
-export const API_URL = "http://127.0.0.1:8000";
+import { API_URL } from "$lib/config";
+import type { Task, NewTask } from "$lib/types/task/task";
 
-export async function fetchTasks() {
+// Get all tasks
+export async function fetchTasks(): Promise<Task[]> {
     const res = await fetch(`${API_URL}/tasks/`);
-    if (!res.ok) {
-        throw new Error("Failed to fetch tasks");
-    }
+    if (!res.ok) throw new Error("Failed to fetch tasks");
     return res.json();
 }
 
-export async function fetchTaskById(id: string) {
+// Get single task
+export async function fetchTaskById(id: string): Promise<Task> {
     const res = await fetch(`${API_URL}/tasks/${id}`);
-    if (!res.ok) {
-        throw new Error("Failed to fetch task details");
-    }
-    return await res.json();
+    if (!res.ok) throw new Error("Failed to fetch task details");
+    return res.json();
 }
 
-export async function createTask(task: { title: string; description: string; priority: number, status: string, progress: number }) {
+// Create a new task
+export async function createTask(task: NewTask): Promise<Task> {
     const res = await fetch(`${API_URL}/tasks/`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(task),
     });
-    if (!res.ok) {
-        throw new Error("Failed to create task");
-    }
+    if (!res.ok) throw new Error("Failed to create task");
     return res.json();
 }
 
-export async function updateTask(id: number, updates: Partial<{ title: string; description: string; priority: number; status: string; progress: number }>) {
+
+// Update a task
+export async function updateTask(id: number, updates: Partial<Omit<Task, "id" | "createdAt" | "updatedAt">>): Promise<Task> {
     const res = await fetch(`${API_URL}/tasks/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updates),
     });
-    if (!res.ok) {
-        throw new Error("Failed to update task");
-    }
+    if (!res.ok) throw new Error("Failed to update task");
     return res.json();
 }
 
-export async function deleteTask(id: number) {
+// Delete a task
+export async function deleteTask(id: number): Promise<{ success: boolean }> {
     const res = await fetch(`${API_URL}/tasks/${id}`, {
         method: "DELETE"
     });
-    if (!res.ok) {
-        throw new Error("Failed to delete task");
-    }
+    if (!res.ok) throw new Error("Failed to delete task");
     return { success: true };
 }
 
-export async function getAIRecommendations(mode: string = "urgent") {
+// Get AI Recommendations
+export async function getAIRecommendations(mode: string = "urgent"): Promise<Task[]> {
     const res = await fetch(`${API_URL}/tasks/recommendations/?mode=${mode}`);
-    if (!res.ok) {
-        throw new Error("Failed to fetch recommendations");
-    }
+    if (!res.ok) throw new Error("Failed to fetch recommendations");
     return res.json();
 }

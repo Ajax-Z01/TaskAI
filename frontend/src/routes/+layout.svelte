@@ -3,6 +3,7 @@
 	import '../styles/global.css';
 	import Navbar from '$lib/components/Navbar.svelte';
 	import Sidebar from '$lib/components/Sidebar.svelte';
+	import ToastHost from '$lib/components/ToastHost.svelte';
 </script>
 
 <div class="layout">
@@ -14,3 +15,5 @@
 		</main>
 	</div>
 </div>
+
+<ToastHost />

@@ -1,25 +1,32 @@
 import os
 import shutil
 import uuid
+import logging
+import magic
 from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from database import get_db, init_db
 from models import Task, Comment, Attachment
 from schemas import TaskCreate, TaskResponse, TaskUpdate, CommentCreate, CommentResponse, AttachmentResponse
 from ai import recommend_tasks
-from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 
 app = FastAPI()
-init_db()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+init_db()
+
+logger = logging.getLogger("taskai")
+logging.basicConfig(level=logging.INFO)
 
 # ==========================
 # ✅ TASKS ENDPOINTS
@@ -120,9 +127,50 @@ def upload_attachment(task_id: int, file: UploadFile = File(...), db: Session = 
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
 
-    file_extension = os.path.splitext(file.filename)[1]
-    unique_filename = f"{datetime.utcnow().strftime('%Y%m%d%H%M%S')}_{uuid.uuid4().hex}{file_extension}"
+    file_extension = os.path.splitext(file.filename)[1].lower()
+    ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".pdf", ".docx", ".xlsx", ".zip", ".txt", ".csv"}
 
+    if file_extension not in ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"File type '{file_extension}' is not allowed."
+        )
+
+    MAX_FILE_SIZE_MB = 5
+    MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024
+    file.file.seek(0, os.SEEK_END)
+    file_size = file.file.tell()
+    file.file.seek(0)
+
+    if file_size > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=400,
+            detail=f"File size exceeds the limit of {MAX_FILE_SIZE_MB} MB."
+        )
+
+    mime = magic.from_buffer(file.file.read(2048), mime=True)
+    file.file.seek(0)
+
+    ALLOWED_MIME_TYPES = {
+        "image/jpeg",
+        "image/png",
+        "image/gif",
+        "application/pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/zip",
+        "text/plain",
+        "text/csv",
+        "application/vnd.ms-excel"
+    }
+
+    if mime not in ALLOWED_MIME_TYPES:
+        raise HTTPException(
+            status_code=400,
+            detail=f"MIME type '{mime}' is not allowed."
+        )
+
+    unique_filename = f"{datetime.utcnow().strftime('%Y%m%d%H%M%S')}_{uuid.uuid4().hex}{file_extension}"
     file_location = os.path.join(UPLOAD_DIR, unique_filename)
 
     with open(file_location, "wb") as buffer:
@@ -130,6 +178,7 @@ def upload_attachment(task_id: int, file: UploadFile = File(...), db: Session = 
 
     new_attachment = Attachment(
         task_id=task_id,
+        original_name=file.filename,
         file_name=unique_filename,
         file_url=file_location
     )
@@ -145,3 +194,41 @@ def get_attachments(task_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Task not found")
 
     return db.query(Attachment).filter(Attachment.task_id == task_id).all()
+
+@app.delete("/attachments/{attachment_id}")
+def delete_attachment(attachment_id: int, db: Session = Depends(get_db)):
+    attachment = db.query(Attachment).filter(Attachment.id == attachment_id).first()
+    if not attachment:
+        raise HTTPException(status_code=404, detail="Attachment not found")
+
+    task = db.query(Task).filter(Task.id == attachment.task_id, Task.is_deleted == False).first()
+    if not task:
+        raise HTTPException(status_code=400, detail="Cannot delete attachment from a deleted or missing task")
+
+    upload_dir_abs = os.path.abspath(UPLOAD_DIR)
+    file_path_abs = os.path.abspath(attachment.file_url)
+
+    if not file_path_abs.startswith(upload_dir_abs):
+        raise HTTPException(status_code=400, detail="Invalid file path")
+
+    try:
+        if os.path.exists(file_path_abs):
+            os.remove(file_path_abs)
+            logger.info(f"Attachment file deleted: {file_path_abs}")
+        else:
+            logger.warning(f"File not found: {file_path_abs}")
+    except Exception as e:
+        logger.error(f"Failed to delete file: {e}")
+        raise HTTPException(status_code=500, detail=f"Error deleting file: {e}")
+
+    db.delete(attachment)
+    db.commit()
+
+    return {"message": "Attachment deleted successfully"}
+
+@app.get("/uploads/{filename}")
+def get_uploaded_file(filename: str):
+    file_path = os.path.join(UPLOAD_DIR, filename)
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="File not found")
+    return FileResponse(file_path)

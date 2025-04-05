@@ -7,19 +7,21 @@
     import { page } from "$app/stores";
 	import { CaretLeftSolid } from "flowbite-svelte-icons";
 	import TaskInfo from "$lib/components/TaskInfo.svelte";
-	import ToastHost from "$lib/components/ToastHost.svelte";
 	import TaskComments from "$lib/components/TaskComments.svelte";
 	import TaskEditModal from "$lib/components/TaskEditModal.svelte";
 	import DeleteConfirmationModal from "$lib/components/DeleteConfirmationModal.svelte";
     import { goto } from "$app/navigation";
+	import TaskAttachmentsList from "$lib/components/TaskAttachmentsList.svelte";
+	import TaskAttachmentsModal from "$lib/components/TaskAttachmentsModal.svelte";
 
     let task: Task | null = null;
     let editedTask: Task | null = null;
     let isEditing = false;
     let isSaving = false;
     let isDeleting = false;
+    let isAttachmentModalOpen = false;
     let isLoading = true;
-    let showSuccessToast = false;
+    let attachmentsListRef: InstanceType<typeof TaskAttachmentsList> | null = null;
     let taskId = "";
     $: taskId = $page.params.id;
 
@@ -45,8 +47,7 @@
         try {
             await updateTask(editedTask.id, editedTask);
             isEditing = false;
-            showSuccessToast = true;
-            setTimeout(() => showSuccessToast = false, 3000);
+            showToast("Task updated successfully", "success");
             loadTask();
         } catch (error) {
             showToast("Failed to update task", "error");
@@ -70,9 +71,6 @@
 </script>
 
 <section class="p-6 mx-auto">
-    {#if showSuccessToast}
-        <ToastHost />
-    {/if}
     {#if isLoading}
         <!-- Skeleton Loader -->
         <div class="animate-pulse space-y-4">
@@ -91,11 +89,17 @@
         </div>
         <div class="flex justify-between items-center mb-4">
             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{task.title}</h1>
-            <Button on:click={startEditing} class="text-white bg-blue-600 hover:bg-blue-700 
-            dark:bg-blue-500 dark:hover:bg-blue-600 transition duration-200 ease-in-out rounded-lg shadow-md cursor-pointer">Edit</Button>
+            <div class="flex gap-4">
+                <Button on:click={() => isAttachmentModalOpen = true}
+                class="text-white bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 transition duration-200 ease-in-out rounded-lg shadow-md cursor-pointer">➕ Add Attachment </Button>
+                <Button on:click={startEditing} class="text-white bg-blue-600 hover:bg-blue-700 
+                dark:bg-blue-500 dark:hover:bg-blue-600 transition duration-200 ease-in-out rounded-lg shadow-md cursor-pointer">Edit </Button>
+            </div>
         </div>
-
+        
         <TaskInfo {...task} />
+        
+        <TaskAttachmentsList bind:this={attachmentsListRef} taskId={taskId} />
         
         <div class="flex justify-end gap-2">
             <Button color="red" on:click={() => isDeleting = true} class="text-white bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 transition duration-200 ease-in-out rounded-lg shadow-md cursor-pointer">Delete Task</Button>
@@ -104,6 +108,15 @@
         <TaskComments taskId={taskId} />
     {:else}
         <p class="text-gray-500 dark:text-gray-400 text-center">Task not found</p>
+    {/if}
+    
+    <!-- Attachmeent Modal -->
+    {#if isAttachmentModalOpen}
+        <TaskAttachmentsModal
+            taskId={taskId}
+            bind:open={isAttachmentModalOpen}
+            on:uploaded={() => attachmentsListRef?.reload()}
+        />
     {/if}
 
     <!-- Edit Modal -->

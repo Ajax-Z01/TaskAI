@@ -47,6 +47,7 @@ class AttachmentCreate(BaseModel):
 class AttachmentResponse(BaseModel):
     id: int
     task_id: int
+    original_name: str
     file_name: str
     file_url: str
     uploaded_at: datetime

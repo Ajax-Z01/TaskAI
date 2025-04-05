@@ -36,7 +36,6 @@
 				</svelte:fragment>
 			</SidebarItem>
 		</SidebarGroup>
-
 	</SidebarWrapper>
 	<!-- Group Logout -->
 	<SidebarGroup border class="pt-4 mt-auto border-t border-gray-300 dark:border-gray-700">

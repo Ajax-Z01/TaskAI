@@ -50,7 +50,7 @@
 	}
 </script>
 
-<div class="flex flex-col-reverse sm:flex-row sm:absolute sm:top-8 sm:right-4 gap-2">
+<div class="flex flex-col-reverse sm:flex-row sm:absolute sm:top-6 sm:right-4 gap-2">
     <Button color="primary" class="hover:scale-105 transition cursor-pointer">
         Get AI Recommendations<ChevronDownOutline class="w-6 h-6 ms-2 text-white dark:text-white" />
     </Button>

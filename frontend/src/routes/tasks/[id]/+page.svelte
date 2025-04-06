@@ -5,7 +5,7 @@
     import { Button } from "flowbite-svelte";
     import type { Task } from "$lib/types/task/task";
     import { page } from "$app/stores";
-	import { CaretLeftSolid } from "flowbite-svelte-icons";
+	import { CaretLeftSolid, EditSolid, TrashBinSolid, UploadSolid } from "flowbite-svelte-icons";
 	import TaskInfo from "$lib/components/TaskInfo.svelte";
 	import TaskComments from "$lib/components/TaskComments.svelte";
 	import TaskEditModal from "$lib/components/TaskEditModal.svelte";
@@ -87,22 +87,27 @@
                 <span>Back to Tasks</span>
             </a>
         </div>
-        <div class="flex justify-between items-center mb-4">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-4">
             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">{task.title}</h1>
-            <div class="flex gap-4">
+            
+            <div class="flex flex-col sm:flex-row gap-2 sm:gap-4">
                 <Button on:click={() => isAttachmentModalOpen = true}
-                class="text-white bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 transition duration-200 ease-in-out rounded-lg shadow-md cursor-pointer">➕ Add Attachment </Button>
-                <Button on:click={startEditing} class="text-white bg-blue-600 hover:bg-blue-700 
-                dark:bg-blue-500 dark:hover:bg-blue-600 transition duration-200 ease-in-out rounded-lg shadow-md cursor-pointer">Edit </Button>
+                    class="flex items-center justify-center text-white bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 transition duration-200 ease-in-out rounded-lg shadow-md cursor-pointer">
+                    <UploadSolid class="w-5 h-5 mr-2" /> Add Attachment
+                </Button>
+        
+                <Button on:click={startEditing} class="flex items-center justify-center text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition duration-200 ease-in-out rounded-lg shadow-md cursor-pointer">
+                    <EditSolid class="w-5 h-5 mr-2" /> Edit
+                </Button>
             </div>
-        </div>
+        </div>        
         
         <TaskInfo {...task} />
         
         <TaskAttachmentsList bind:this={attachmentsListRef} taskId={taskId} />
         
         <div class="flex justify-end gap-2">
-            <Button color="red" on:click={() => isDeleting = true} class="text-white bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 transition duration-200 ease-in-out rounded-lg shadow-md cursor-pointer">Delete Task</Button>
+            <Button color="red" on:click={() => isDeleting = true} class="text-white bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 transition duration-200 ease-in-out rounded-lg shadow-md cursor-pointer"><TrashBinSolid class="w-5 h-5 mr-2" />Delete Task</Button>
         </div>
         
         <TaskComments taskId={taskId} />

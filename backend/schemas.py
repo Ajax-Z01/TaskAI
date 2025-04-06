@@ -1,6 +1,19 @@
 from pydantic import BaseModel
 from datetime import datetime
 
+class UserCreate(BaseModel):
+    username: str
+    email: str
+
+class UserResponse(BaseModel):
+    id: int
+    username: str
+    email: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+        
 class TaskCreate(BaseModel):
     title: str
     description: str
@@ -30,10 +43,12 @@ class TaskResponse(BaseModel):
 
 class CommentCreate(BaseModel):
     content: str
+    author_id: int
 
 class CommentResponse(BaseModel):
     id: int
     task_id: int
+    author: UserResponse
     content: str
     created_at: datetime
 

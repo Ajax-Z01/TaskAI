@@ -2,7 +2,38 @@ import requests
 
 BASE_URL = "http://127.0.0.1:8000"
 TASKS_URL = f"{BASE_URL}/tasks/"
+USERS_URL = f"{BASE_URL}/users/"
 HEADERS = {"Content-Type": "application/json"}
+
+users = [
+    {"username": "ajax", "email": "ajax@example.com"},
+    {"username": "luna", "email": "luna@example.com"},
+    {"username": "kevin", "email": "kevin@example.com"},
+    {"username": "rina", "email": "rina@example.com"},
+    {"username": "mika", "email": "mika@example.com"}
+]
+
+user_ids = []
+
+print("📌 Menambahkan dummy users...")
+for user in users:
+    response = requests.post(USERS_URL, json=user, headers=HEADERS)
+    if response.status_code == 200:
+        user_id = response.json()["id"]
+        user_ids.append(user_id)
+        print(f"✅ User {user_id} ditambahkan: {user['username']}")
+    else:
+        print(f"❌ Gagal menambahkan user: {user['username']}", response.text)
+
+# Menampilkan hasil semua user
+print("\n📌 Mengambil semua users...")
+response = requests.get(USERS_URL)
+if response.status_code == 200:
+    all_users = response.json()
+    for user in all_users:
+        print(f"🔹 {user['id']}: {user['username']} ({user['email']})")
+else:
+    print("❌ Gagal mengambil daftar user")
 
 tasks = [
     {
@@ -63,11 +94,12 @@ if response.status_code == 200:
 else:
     print("❌ Gagal mengambil daftar tugas")
 
-if task_ids:
+if task_ids and user_ids:
     first_task_id = task_ids[0]
     COMMENT_URL = f"{BASE_URL}/tasks/{first_task_id}/comments/"
     comment_data = {
         "task_id": first_task_id,
+        "author_id": user_ids[0],
         "content": "Ini adalah komentar pertama untuk tugas ini!"
     }
 
@@ -77,7 +109,6 @@ if task_ids:
         print("✅ Komentar berhasil ditambahkan!")
     else:
         print("❌ Gagal menambahkan komentar", response.text)
-
 
 if task_ids:
     first_task_id = task_ids[0]

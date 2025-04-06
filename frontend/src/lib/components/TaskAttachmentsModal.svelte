@@ -4,6 +4,7 @@
 	import { showToast } from '$lib/stores/toast';
 	import { uploadAttachment, getAttachmentUrl } from '$lib/api/attachments';
 	import type { Attachment, RawAttachment } from '$lib/types/task/attachment';
+	import { UploadSolid } from 'flowbite-svelte-icons';
 
 	// Props & dispatcher
 	export let open = false;
@@ -25,9 +26,7 @@
 	let files: File[] = [];
 	let selectedFiles: FileList | undefined;
 	let previews: string[] = [];
-	let isUploading = false;
 
-	// Helpers
 	function isValidFileType(file: File) {
 		return allowedTypes.includes(file.type);
 	}
@@ -87,7 +86,6 @@
 			return;
 		}
 
-		isUploading = true;
 		showToast('Uploading files...', 'info');
 
 		try {
@@ -104,7 +102,6 @@
 		} catch (err) {
 			showToast('Failed to upload files', 'error');
 		} finally {
-			isUploading = false;
 			files = [];
 			selectedFiles = undefined;
 			cleanupPreviews();
@@ -112,7 +109,7 @@
 	}
 </script>
 
-<Modal bind:open title="📎 Upload Attachments" size="lg" autoclose outsideclose>
+<Modal bind:open title="Upload Attachments" size="lg" autoclose outsideclose>
 	<div class="space-y-4">
 		<Label class="block text-sm font-medium text-gray-700 dark:text-white">
 			Select files
@@ -144,9 +141,9 @@
 
 	<svelte:fragment slot="footer">
 		<div class="w-full flex justify-end gap-3 mt-2">
-			<Button color="red" on:click={closeModal}>Cancel</Button>
-			<Button color="blue" on:click={handleUpload} disabled={isUploading || files.length === 0}>
-				{isUploading ? '⏳ Uploading...' : '⬆️ Upload'}
+			<Button color="red" class="text-white bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 transition duration-200 ease-in-out rounded-lg shadow-md cursor-pointer" on:click={closeModal}>Cancel</Button>
+			<Button color="blue" class="text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition duration-200 ease-in-out rounded-lg shadow-md disabled:cursor-not-allowed cursor-pointer" on:click={handleUpload} disabled={files.length === 0}>
+				<UploadSolid class="w-5 h-5 mr-2" /> Upload
 			</Button>
 		</div>
 	</svelte:fragment>

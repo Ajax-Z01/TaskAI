@@ -8,8 +8,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from database import get_db, init_db
-from models import Task, Comment, Attachment
-from schemas import TaskCreate, TaskResponse, TaskUpdate, CommentCreate, CommentResponse, AttachmentResponse
+from models import Task, Comment, Attachment, User
+from schemas import TaskCreate, TaskResponse, TaskUpdate, CommentCreate, CommentResponse, AttachmentResponse, UserCreate, UserResponse
 from ai import recommend_tasks
 from datetime import datetime
 
@@ -27,6 +27,25 @@ init_db()
 
 logger = logging.getLogger("taskai")
 logging.basicConfig(level=logging.INFO)
+
+# ==========================
+# ✅ USERS ENDPOINTS
+# ==========================
+@app.post("/users/", response_model=UserResponse)
+def create_user(user: UserCreate, db: Session = Depends(get_db)):
+    existing_user = db.query(User).filter((User.username == user.username) | (User.email == user.email)).first()
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Username or email already exists")
+
+    new_user = User(username=user.username, email=user.email)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
+
+@app.get("/users/", response_model=list[UserResponse])
+def get_all_users(db: Session = Depends(get_db)):
+    return db.query(User).all()
 
 # ==========================
 # ✅ TASKS ENDPOINTS
@@ -100,11 +119,26 @@ def add_comment(task_id: int, comment: CommentCreate, db: Session = Depends(get_
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
 
-    new_comment = Comment(task_id=task_id, content=comment.content)
+    user = db.query(User).filter(User.id == comment.author_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    new_comment = Comment(
+        task_id=task_id,
+        content=comment.content,
+        author_id=comment.author_id
+    )
     db.add(new_comment)
     db.commit()
     db.refresh(new_comment)
-    return new_comment
+
+    return CommentResponse(
+        id=new_comment.id,
+        task_id=new_comment.task_id,
+        author=UserResponse.from_orm(user),
+        content=new_comment.content,
+        created_at=new_comment.created_at
+    )
 
 @app.get("/tasks/{task_id}/comments/", response_model=list[CommentResponse])
 def get_comments(task_id: int, db: Session = Depends(get_db)):
@@ -112,7 +146,8 @@ def get_comments(task_id: int, db: Session = Depends(get_db)):
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
 
-    return db.query(Comment).filter(Comment.task_id == task_id).all()
+    comments = db.query(Comment).filter(Comment.task_id == task_id).all()
+    return comments
 
 # ==========================
 # ✅ ATTACHMENTS ENDPOINTS
@@ -193,7 +228,10 @@ def get_attachments(task_id: int, db: Session = Depends(get_db)):
     if not task:
         raise HTTPException(status_code=404, detail="Task not found")
 
-    return db.query(Attachment).filter(Attachment.task_id == task_id).all()
+    return db.query(Attachment).filter(
+        Attachment.task_id == task_id,
+        Attachment.is_deleted == False
+    ).all()
 
 @app.delete("/attachments/{attachment_id}")
 def delete_attachment(attachment_id: int, db: Session = Depends(get_db)):
@@ -221,10 +259,18 @@ def delete_attachment(attachment_id: int, db: Session = Depends(get_db)):
         logger.error(f"Failed to delete file: {e}")
         raise HTTPException(status_code=500, detail=f"Error deleting file: {e}")
 
-    db.delete(attachment)
+    attachment.is_deleted = True
     db.commit()
 
-    return {"message": "Attachment deleted successfully"}
+    return {"message": "Attachment soft-deleted successfully"}
+
+@app.get("/tasks/{task_id}/attachments/all/", response_model=list[AttachmentResponse])
+def get_all_attachments(task_id: int, db: Session = Depends(get_db)):
+    task = db.query(Task).filter(Task.id == task_id).first()
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    return db.query(Attachment).filter(Attachment.task_id == task_id).all()
 
 @app.get("/uploads/{filename}")
 def get_uploaded_file(filename: str):

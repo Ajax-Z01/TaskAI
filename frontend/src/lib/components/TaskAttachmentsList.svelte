@@ -8,6 +8,7 @@
 		getAttachmentUrl
 	} from '$lib/api/attachments';
 	import type { Attachment, RawAttachment } from '$lib/types/task/attachment';
+	import { ClockSolid, DownloadSolid, EyeSolid, FileSolid, TrashBinSolid } from 'flowbite-svelte-icons';
 
 	export let taskId: string;
 
@@ -68,6 +69,23 @@
 			showToast('Failed to delete attachment', 'error');
 		}
 	}
+    
+    async function downloadFile(url: string, filename: string) {
+        try {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(blobUrl);
+        } catch (error) {
+            showToast('Failed to download file', 'error');
+        }
+    }
 
 	onMount(loadAttachments);
 </script>
@@ -80,19 +98,19 @@
                 <li class="flex flex-col md:flex-row md:items-start md:justify-between bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-4 rounded-xl shadow-sm hover:shadow-md transition">
                     <div class="flex-1 space-y-1">
                         <a href={file.url} target="_blank" class="font-medium text-blue-600 dark:text-blue-400 hover:underline break-words items-center">
-                            📎 {file.original_name}
+                            <FileSolid class="inline" /> {file.original_name}
                         </a>
-                        <div class="text-xs text-gray-500 dark:text-gray-400">
-                            🕒 Uploaded at: {formatDate(file.created_at)}
+                        <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            <ClockSolid class="inline" /> Uploaded at: {formatDate(file.created_at)}
                         </div>
 
                         {#if isPreviewable(file)}
-                        <Button color="green" size="xs" on:click={() => openPreview(file)} class="mt-3 md:mt-0 md:ml-4 w-max cursor-pointer">
-                            👁️ Preview
+                        <Button color="green" size="xs" on:click={() => openPreview(file)} class="mt-3 md:mt-0 w-max text-white bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 transition duration-200 ease-in-out rounded-lg shadow-md cursor-pointer">
+                            <EyeSolid class="w-4 h-4 mr-1" /> Preview
                         </Button>
                         {/if}
-                        <Button color="red" size="xs" on:click={() => handleDelete(file.id)} class="mt-3 md:mt-0 md:ml-4 w-max cursor-pointer" >
-                            🗑️ Delete
+                        <Button color="red" size="xs" on:click={() => handleDelete(file.id)} class="mt-3 md:mt-0 ml-4 w-max text-white bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 transition duration-200 ease-in-out rounded-lg shadow-md cursor-pointer" >
+                            <TrashBinSolid class="w-4 h-4 mr-1" /> Delete
                         </Button>
                     </div>
                 </li>
@@ -101,45 +119,37 @@
     </div>
 {/if}
 
-<Modal
-    title={`📄 ${previewFile?.original_name ?? 'Preview'}`}
-    bind:open={isPreviewModalOpen}
-    autoclose
-    outsideclose
-    size="xl"
->
-    <div class="space-y-5">
-        <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg shadow">
-            <div class="text-sm text-gray-700 dark:text-gray-300">
-                <div><strong>Filename:</strong> {previewFile?.original_name}</div>
-                <div><strong>Stored as:</strong> {previewFile?.filename}</div>
-                <div><strong>Uploaded at:</strong> {previewFile ? formatDate(previewFile.created_at) : ''}</div>
-            </div>
+<Modal title={`📄 ${previewFile?.original_name ?? 'Preview'}`} bind:open={isPreviewModalOpen} autoclose outsideclose size="lg">
+    <div class="bg-gray-50 dark:bg-gray-800 rounded-lg shadow">
+        <div class="text-sm text-gray-700 dark:text-gray-300">
+            <div><strong>Filename:</strong> {previewFile?.original_name}</div>
+            <div><strong>Stored as:</strong> {previewFile?.filename}</div>
+            <div><strong>Uploaded at:</strong> {previewFile ? formatDate(previewFile.created_at) : ''}</div>
         </div>
-
-        {#if previewFile}
-            {#if previewFile.filename.endsWith('.pdf')}
-                <iframe
-                    src={previewFile.url}
-                    title="PDF Preview"
-                    class="w-full h-[70vh] rounded-xl border border-gray-200 dark:border-gray-700"
-                ></iframe>
-            {:else}
-                <img
-                    src={previewFile.url}
-                    alt="Preview"
-                    class="max-w-full max-h-[60vh] rounded-xl mx-auto border border-gray-200 dark:border-gray-700"
-                />
-            {/if}
-        {/if}
     </div>
+
+    {#if previewFile}
+        {#if previewFile.filename.endsWith('.pdf')}
+            <iframe
+                src={previewFile.url}
+                title="PDF Preview"
+                class="w-full h-[70vh] rounded-xl border border-gray-200 dark:border-gray-700"
+            ></iframe>
+        {:else}
+            <img
+                src={previewFile.url}
+                alt="Preview"
+                class="max-w-full max-h-[60vh] rounded-xl mx-auto border border-gray-200 dark:border-gray-700"
+            />
+        {/if}
+    {/if}
 
     <svelte:fragment slot="footer">
         <div class="w-full flex justify-end gap-3 mt-4">
-            <Button color="blue" on:click={() => window.open(previewFile?.url, '_blank')}>
-                ⬇️ Download
+            <Button color="blue" class="text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition duration-200 ease-in-out rounded-lg shadow-md cursor-pointer" on:click={() => previewFile && downloadFile(previewFile.url, previewFile.original_name)}>
+                <DownloadSolid class="w-5 h-5 me-2" /> Download
             </Button>
-            <Button color="red" on:click={closePreview}>Close</Button>
+            <Button color="red" class="text-white bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 transition duration-200 ease-in-out rounded-lg shadow-md cursor-pointer" on:click={closePreview}>Close</Button>
         </div>
     </svelte:fragment>
 </Modal>

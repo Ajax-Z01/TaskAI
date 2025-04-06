@@ -4,6 +4,16 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True, nullable=False)
+    email = Column(String, unique=True, index=True, nullable=False)
+    created_at = Column(DateTime, server_default=func.now())
+    
+    # Relationship
+    comments = relationship("Comment", back_populates="author")
+
 class Task(Base):
     __tablename__ = "tasks"
 
@@ -28,11 +38,13 @@ class Comment(Base):
     __tablename__ = "comments"
 
     id = Column(Integer, primary_key=True, index=True)
-    task_id = Column(Integer, ForeignKey("tasks.id", ondelete="CASCADE"))
+    task_id = Column(Integer, ForeignKey("tasks.id", ondelete="CASCADE"), nullable=False)
+    author_id = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
     content = Column(Text, nullable=False)
     created_at = Column(DateTime, server_default=func.now())
 
     # Relationship
+    author = relationship("User", back_populates="comments")
     task = relationship("Task", back_populates="comments")
 
 class Attachment(Base):

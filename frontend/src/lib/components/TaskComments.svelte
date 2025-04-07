@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { Input, Button, Textarea } from "flowbite-svelte";
+  import { Button, Textarea } from "flowbite-svelte";
   import { getCommentsByTaskId, postComment } from "$lib/api/comments";
   import type { Comment } from "$lib/types/comment";
 	import { MessagesSolid } from "flowbite-svelte-icons";
@@ -24,8 +24,9 @@
 
   async function submitComment() {
     if (!newComment.trim()) return;
+    const dummyAuthorId = Math.floor(Math.random() * 5) + 1;
     try {
-      await postComment(taskId, newComment);
+      await postComment(taskId, newComment, dummyAuthorId);
       newComment = "";
       loadComments();
     } catch (err) {
@@ -49,13 +50,13 @@
         <li class="flex gap-3 items-start py-4   shadow-md">
           <!-- Avatar / Initials -->
           <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold dark:bg-blue-500">
-            {(comment.author || "A").charAt(0).toUpperCase()}
+            {(comment.author.username || "A").charAt(0).toUpperCase()}
           </div>
 
           <!-- Comment Content -->
           <div class="bg-gray-100 dark:bg-gray-800 rounded-xl flex-1">
             <div class="flex justify-between items-center mb-1">
-              <span class="font-semibold text-gray-900 dark:text-white">{comment.author || "Anonymous"}</span>
+              <span class="font-semibold text-gray-900 dark:text-white">{comment.author.username || "Anonymous"}</span>
               <span class="text-xs text-gray-500 dark:text-gray-400">{new Date(comment.created_at).toLocaleString()}</span>
             </div>
             <p class="text-gray-800 dark:text-gray-200 text-sm leading-relaxed whitespace-pre-wrap">{comment.content}</p>

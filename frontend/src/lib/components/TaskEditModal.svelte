@@ -13,6 +13,17 @@
     $: if (!open) {
         dispatch('close');
     }
+    $: {
+        if (editedTask) {
+            if (editedTask.progress === 0) {
+                editedTask.status = "Pending";
+            } else if (editedTask.progress > 0 && editedTask.progress < 100) {
+                editedTask.status = "In Progress";
+            } else if (editedTask.progress === 100) {
+                editedTask.status = "Completed";
+            }
+        }
+    }
 </script>
 
 <Modal bind:open={open} autoclose outsideclose title="Edit Task">

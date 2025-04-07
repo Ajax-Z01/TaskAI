@@ -26,6 +26,16 @@
 	let priority = 1;
 	let status = "Pending";
 	let progress = 0;
+    
+    $: {
+        if (progress === 0) {
+            status = "Pending";
+        } else if (progress > 0 && progress < 100) {
+            status = "In Progress";
+        } else if (progress === 100) {
+            status = "Completed";
+        }
+    }
 
 	const priorities = [
 		{ value: 1, name: "Low" },
@@ -231,7 +241,7 @@
             </Label>
 
             <Label>Status
-                <Select bind:value={status} items={statuses} class="mt-2 w-full p-2 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-white"/>
+                <Input bind:value={status} readonly class="mt-2 dark:bg-gray-700 dark:text-white cursor-not-allowed" />
             </Label>
 
             <div class="relative mb-8">

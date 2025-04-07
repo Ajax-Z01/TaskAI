@@ -7,11 +7,11 @@ export async function getCommentsByTaskId(taskId: string): Promise<Comment[]> {
   return res.json();
 }
 
-export async function postComment(taskId: string, content: string): Promise<void> {
-  const res = await fetch(`${API_URL}/tasks/${taskId}/comments`, {
+export async function postComment(taskId: string, content: string, author_id: number): Promise<void> {
+  const res = await fetch(`${API_URL}/tasks/${taskId}/comments/`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ content }),
+    body: JSON.stringify({ content, author_id }),
   });
   if (!res.ok) throw new Error("Failed to post comment");
 }

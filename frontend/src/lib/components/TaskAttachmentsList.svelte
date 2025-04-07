@@ -24,7 +24,6 @@
 		try {
 			const data: RawAttachment[] = await fetchAttachments(Number(taskId));
 			attachments = data.map(mapRawToAttachment);
-			console.log('Loaded attachments:', attachments);
 		} catch (err) {
 			showToast('Failed to load attachments', 'error');
 		}

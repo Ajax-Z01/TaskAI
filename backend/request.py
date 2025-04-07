@@ -6,7 +6,7 @@ USERS_URL = f"{BASE_URL}/users/"
 HEADERS = {"Content-Type": "application/json"}
 
 users = [
-    {"username": "ajax", "email": "ajax@example.com"},
+    {"username": "user1", "email": "user@example.com"},
     {"username": "luna", "email": "luna@example.com"},
     {"username": "kevin", "email": "kevin@example.com"},
     {"username": "rina", "email": "rina@example.com"},

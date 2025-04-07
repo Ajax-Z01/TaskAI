@@ -23,11 +23,11 @@
 
     <Dropdown placement="bottom-end" triggeredBy="#avatar-menu" class="w-56 shadow-lg rounded-lg bg-white dark:bg-gray-800 border dark:border-gray-700">
         <DropdownHeader class="p-3 dark:border-gray-700">
-            <span class="block text-sm font-semibold text-gray-900 dark:text-white">John Doe</span>
-            <span class="block truncate text-xs text-gray-500">john@example.com</span>
+            <span class="block text-sm font-semibold text-gray-900 dark:text-white">User1</span>
+            <span class="block truncate text-xs text-gray-500">user1@example.com</span>
         </DropdownHeader>
     
-        <DropdownItem href="/dashboard" class="flex items-center gap-2 p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all rounded-md">
+        <DropdownItem href="/" class="flex items-center gap-2 p-3 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all rounded-md">
             <i class="fas fa-chart-line text-gray-600 dark:text-gray-400"></i>
             <span>Dashboard</span>
         </DropdownItem>

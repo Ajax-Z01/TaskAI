@@ -11,6 +11,10 @@
     
     let tasks: Task[] = [];
     let taskStats = { Low: 0, Medium: 0, High: 0 };
+    let completedCount = 0;
+    let averageProgress = 0;
+    
+    $: latestTasks = [...tasks].sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()).slice(0, 5);
 
     const PRIORITY_MAP: Record<number, string> = { 3: "Low", 2: "Medium", 1: "High" };
     const COLORS = { Low: '#22C55E', Medium: '#FACC15', High: '#DC2626' };
@@ -46,6 +50,7 @@
             });
 
             updateChartData();
+            updateTrendChart()
         } catch (error) {
             console.error("Failed to fetch tasks", error);
         }
@@ -76,6 +81,10 @@
             Medium: priorityGroups.Medium.count,
             High: priorityGroups.High.count
         };
+        
+        completedCount = tasks.filter(task => task.progress === 100).length;
+        const totalProgress = tasks.reduce((acc, t) => acc + t.progress, 0);
+        averageProgress = tasks.length ? totalProgress / tasks.length : 0;
     }
 
     const options: ApexOptions = {
@@ -94,6 +103,65 @@
         tooltip: { enabled: true, x: { show: false } },
         yaxis: { labels: { formatter: (value) => `${value.toFixed(2)}%` } }
     };
+    
+    const trendOptions: ApexOptions = {
+        series: [],
+        chart: {
+            type: 'line',
+            height: 250,
+            zoom: { enabled: false },
+            toolbar: { show: false },
+            fontFamily: 'Inter, sans-serif',
+        },
+        stroke: { curve: 'smooth' },
+        xaxis: {
+            categories: [],
+            labels: { rotate: -45 },
+        },
+        yaxis: {
+            min: 0,
+            max: 100,
+            labels: { formatter: val => `${val}%` },
+        },
+        dataLabels: { enabled: false },
+        colors: ['#3B82F6'],
+        tooltip: { y: { formatter: val => `${val.toFixed(2)}%` } },
+    };
+    
+    function updateTrendChart() {
+        const trendMap: Record<string, { total: number; count: number }> = {};
+
+        const today = new Date();
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date(today);
+            date.setDate(today.getDate() - i);
+            const key = date.toISOString().split('T')[0];
+            trendMap[key] = { total: 0, count: 0 };
+        }
+
+        tasks.forEach(task => {
+            const date = new Date(task.updated_at);
+            const localDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+            const key = localDate.toISOString().split('T')[0];
+
+            if (trendMap[key]) {
+                trendMap[key].total += task.progress;
+                trendMap[key].count += 1;
+            }
+        });
+
+        const categories = Object.keys(trendMap);
+        const seriesData = categories.map(date => {
+            const entry = trendMap[date];
+            return entry.count > 0 ? entry.total / entry.count : 0;
+        });
+
+        const maxY = Math.ceil(Math.max(...seriesData, 10) / 10) * 10;
+
+        trendOptions.series = [{ name: 'Avg Progress', data: seriesData }];
+        trendOptions.xaxis = { ...trendOptions.xaxis, categories };
+        trendOptions.yaxis = { ...trendOptions.yaxis, max: maxY };
+    }
 
     function selectPeriod(period: string) {
         selectedPeriod = period;
@@ -103,12 +171,27 @@
     onMount(fetchData);
 </script>
 
-  
+<div class="col-span-full p-4 pb-0">
+    <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Reports Overview</h1>
+    <p class="text-gray-600 dark:text-gray-300 mb-4">Track and analyze your task progress.</p>
+</div>
+
 <section class="relative grid md:grid-cols-2 lg:grid-cols-3 p-4">
-    <div class="col-span-full">
-        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Reports Overview</h1>
-        <p class="text-gray-600 dark:text-gray-300 mb-4">Track and analyze your task progress.</p>
-    </div>
+    <Card>
+        <div class="text-sm text-gray-400">📅 Most Active Day</div>
+        <div class="text-lg font-bold">Wednesday</div>
+    </Card>
+    <Card>
+        <div class="text-sm text-gray-400">✅ Tasks Completed</div>
+        <div class="text-lg font-bold">{completedCount}</div>
+    </Card>
+    <Card>
+        <div class="text-sm text-gray-400">📈 Avg. Progress</div>
+        <div class="text-lg font-bold">{averageProgress.toFixed(0)}%</div>
+    </Card>
+</section>
+
+<section class="relative grid md:grid-cols-2 lg:grid-cols-3 p-4">
     <Card>
         <div class="flex justify-between items-start w-full">
             <div class="flex-col items-center">
@@ -144,34 +227,13 @@
                 <dd class="text-green-600 dark:text-green-300 text-sm font-medium">Low</dd>
                 </dl>
             </div>
-            <button on:click={() => (isOpen = !isOpen)} type="button" class="hover:underline text-xs text-gray-500 dark:text-gray-400 font-medium inline-flex items-center">Show more details <ChevronDownOutline class="w-2 h-2 ms-1" /> </button>
-            {#if isOpen}
-                <div id="more-details" class="border-gray-200 border-t dark:border-gray-600 pt-3 mt-3 space-y-2">
-                <dl class="flex items-center justify-between">
-                    <dt class="text-gray-500 dark:text-gray-400 text-sm font-normal">Average task completion rate:</dt>
-                    <dd class="bg-green-100 text-green-800 text-xs font-medium inline-flex items-center px-2.5 py-1 rounded-md dark:bg-green-900 dark:text-green-300">
-                    <svg class="w-2.5 h-2.5 me-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 14">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13V1m0 0L1 5m4-4 4 4" />
-                    </svg> 57%
-                    </dd>
-                </dl>
-                <dl class="flex items-center justify-between">
-                    <dt class="text-gray-500 dark:text-gray-400 text-sm font-normal">Days until sprint ends:</dt>
-                    <dd class="bg-gray-100 text-gray-800 text-xs font-medium inline-flex items-center px-2.5 py-1 rounded-md dark:bg-gray-600 dark:text-gray-300">13 days</dd>
-                </dl>
-                <dl class="flex items-center justify-between">
-                    <dt class="text-gray-500 dark:text-gray-400 text-sm font-normal">Next meeting:</dt>
-                    <dd class="bg-gray-100 text-gray-800 text-xs font-medium inline-flex items-center px-2.5 py-1 rounded-md dark:bg-gray-600 dark:text-gray-300">Thursday</dd>
-                </dl>
-                </div>
-            {/if}
         </div>
         
         <Chart {options} class="py-6" />
         
         <div class="grid grid-cols-1 border-gray-200 border-t dark:border-gray-700 justify-between">
             <div class="flex justify-between items-center pt-5">
-            <Button class="text-sm font-medium text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+            <Button class="text-sm font-medium hover:text-gray-900 dark:hover:text-white">
                 {selectedPeriod} <ChevronDownOutline class="w-2.5 ms-1.5" />
             </Button>
             <Dropdown>
@@ -180,9 +242,74 @@
                 <DropdownItem on:click={() => selectPeriod('Last 30 days')}>Last 30 days</DropdownItem>
             </Dropdown>                    
             <a href="/progress-report" class="uppercase text-sm font-semibold hover:text-primary-700 dark:hover:text-primary-500 px-3 py-2">
-                PROGRESS REPORT <ChevronRightOutline class="w-2.5 h-2.5 ms-1.5" />
+                PROGRESS REPORT <ChevronRightOutline class="w-5 h-5 ms-1 inline" />
             </a>
             </div>
         </div>
     </Card>
+    
+    <Card>
+        <div class="flex justify-between items-start w-full">
+            <div class="flex-col items-center">
+                <div class="flex items-center mb-1">
+                    <h5 class="text-xl font-bold text-gray-900 dark:text-white me-1">Progress Trend</h5>
+                    <InfoCircleSolid id="donut1" class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white cursor-pointer ms-1" />
+                    <Popover triggeredBy="#donut1" class="text-sm text-gray-500 bg-white border border-gray-200 rounded-lg shadow-xs w-72 dark:bg-gray-800">
+                    <div class="p-3 space-y-2">
+                        <h3 class="font-semibold text-gray-900 dark:text-white">Progress Overview</h3>
+                        <p>This report shows the progress breakdown of tasks over the selected period.</p>
+                    </div>
+                    </Popover>
+                </div>
+            </div>
+            <div class="flex justify-end items-center">
+            <ArrowDownToBracketOutline class="w-3.5 h-3.5" />
+            <Tooltip>Download CSV</Tooltip>
+            </div>
+        </div>
+        <div class="mt-6 p-4 bg-gray-800 rounded-xl text-white shadow">
+          <div class="text-md font-semibold mb-2">📈 Progress Trend (Last 7 days)</div>
+          {#if trendOptions}
+            <Chart options={trendOptions} class="h-64" />
+          {:else}
+            <p>Loading chart...</p>
+          {/if}
+        </div>
+    </Card>
+    
+    <Card>
+        <div class="flex justify-between items-start w-full">
+            <div class="flex-col items-center">
+                <div class="flex items-center mb-1">
+                    <h5 class="text-xl font-bold text-gray-900 dark:text-white me-1">Latest Tasks</h5>
+                    <InfoCircleSolid id="donut1" class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white cursor-pointer ms-1" />
+                    <Popover triggeredBy="#donut1" class="text-sm text-gray-500 bg-white border border-gray-200 rounded-lg shadow-xs w-72 dark:bg-gray-800">
+                    <div class="p-3 space-y-2">
+                        <h3 class="font-semibold text-gray-900 dark:text-white">Progress Overview</h3>
+                        <p>This report shows the progress breakdown of tasks over the selected period.</p>
+                    </div>
+                    </Popover>
+                </div>
+            </div>
+            <div class="flex justify-end items-center">
+            <ArrowDownToBracketOutline class="w-3.5 h-3.5" />
+            <Tooltip>Download CSV</Tooltip>
+            </div>
+        </div>
+        <div class="mt-6 p-4 bg-gray-800 rounded-xl text-white shadow">
+          <div class="text-md font-semibold mb-2">📝 Latest Tasks</div>
+          <ul class="space-y-1 text-sm text-gray-300">
+            {#each latestTasks as task}
+                <li>
+                • {task.title} – 
+                <span class={task.priority === 1 ? 'text-red-400' : task.priority === 2 ? 'text-yellow-400' : 'text-green-400'}>
+                    {PRIORITY_MAP[task.priority]}
+                </span>
+                </li>
+            {/each}
+          </ul>
+        </div>
+    </Card>
 </section>
+  
+  

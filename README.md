@@ -1,4 +1,4 @@
-# TaskAI
+# 🤖 TaskAI
 
 TaskAI is a task management application that leverages artificial intelligence to suggest task prioritization. The application is built using **FastAPI** for the backend and **SvelteKit** for the frontend.
 
@@ -6,6 +6,8 @@ TaskAI is a task management application that leverages artificial intelligence t
 - **Task Management:** Create, edit, delete, and mark tasks as completed.
 - **AI Recommendations:** An AI-powered algorithm suggests task order based on priority.
 - **Interactive Dashboard:** A modern UI for easy task management.
+- **Comments:** Add comments to tasks for better collaboration.
+- **File Attachments:** Attach files to tasks for better context.
 - **Flexible Settings:** Dark/light theme, user preferences, and more (coming soon).
 
 ## 📂 Project Structure
@@ -29,45 +31,103 @@ TaskAI/
 └── README.md              # Project documentation
 ```
 
-## 🔧 How to Run the Project
+---
 
-### 1. Running the Backend (FastAPI)
-```sh
+## 🔧 Getting Started
+
+### 1. Clone the Repository
+
+```bash
 git clone https://github.com/Ajax-Z01/TaskAI.git
-cd TaskAI/backend
+cd TaskAI
+```
 
-# Create a virtual environment (optional)
+### 2. Backend Setup (FastAPI)
+
+```bash
+cd backend
 python -m venv venv
-source venv/bin/activate  # For Mac/Linux
-venv\Scripts\activate     # For Windows
-
-# Install dependencies
+source venv/bin/activate       # On Unix/Mac
+venv\Scripts\activate        # On Windows
 pip install -r requirements.txt
-
-# Run FastAPI server
 uvicorn main:app --reload
 ```
 
-### 2. Running the Frontend (SvelteKit)
-```sh
-cd TaskAI/frontend
+> Backend will run at `http://localhost:8000`
 
-# Install dependencies
-npm install
+### 3. Frontend Setup (SvelteKit)
 
-# Start development server
-npm run dev
+```bash
+cd frontend
+pnpm install    # or npm install / yarn install
+pnpm run dev
 ```
 
-The application will be available at **http://localhost:5173/** (frontend) and **http://localhost:8000/** (backend).
+> Frontend will be available at `http://localhost:5173`
+
+---
+
+## 📡 API Endpoints Overview
+
+### Users
+- `POST /users/`
+- `GET /users/`
+
+### Tasks
+- `GET /tasks/`
+- `GET /tasks/{id}`
+- `POST /tasks/`
+- `PUT /tasks/{id}`
+- `DELETE /tasks/{id}`
+- `GET /tasks/recommendations/?mode={urgent|balanced}`
+
+### Comments
+- `POST /tasks/{id}/comments/`
+- `GET /tasks/{id}/comments/`
+
+### Attachments
+- `POST /tasks/{id}/attachments/`
+- `GET /tasks/{id}/attachments/`
+- `DELETE /attachments/{id}`
+- `GET /uploads/{filename}`
+
+---
+
+## 🧠 AI Recommendation Modes
+
+- `urgent`: Prioritize tasks based on urgency and deadlines.
+- `daily`: Balance tasks based on daily workload and deadlines.
+- `progress`: Focus on tasks that are in progress or need immediate attention.
+- `impact`: Prioritize tasks based on their impact and importance.
+
+---
 
 ## 📌 Roadmap
-- [x] FastAPI backend for CRUD task management
-- [x] AI model for task prioritization
-- [x] Initial frontend setup with SvelteKit
-- [x] Task detail page
-- [ ] Application settings (theme, preferences, etc.)
-- [ ] UI/UX improvements
 
-## 💡 Contribution
-If you would like to contribute, feel free to fork this repository and submit a pull request. All feedback and suggestions are welcome!
+- Authentication & User Roles
+- Advanced AI Prioritization
+- UI/UX Enhancements
+- Settings & Customization
+- Reports & Analytics
+- Mobile Support
+
+---
+
+## 🤝 Contribution
+
+1. Fork the repository  
+2. Create your feature branch  
+3. Commit your changes  
+4. Push and open a Pull Request
+
+---
+
+## 📃 License
+
+This project is licensed under the MIT License.
+
+---
+
+## 🙌 Author
+
+Made with ❤️ by [Ajax-Z01](https://github.com/Ajax-Z01)

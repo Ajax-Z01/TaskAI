@@ -200,15 +200,11 @@
                     <InfoCircleSolid id="donut1" class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white cursor-pointer ms-1" />
                     <Popover triggeredBy="#donut1" class="text-sm text-gray-500 bg-white border border-gray-200 rounded-lg shadow-xs w-72 dark:bg-gray-800">
                     <div class="p-3 space-y-2">
-                        <h3 class="font-semibold text-gray-900 dark:text-white">Progress Overview</h3>
-                        <p>This report shows the progress breakdown of tasks over the selected period.</p>
+                        <h3 class="font-semibold text-gray-900 dark:text-white">Tasks Progress</h3>
+                        <p>This report shows the progress of tasks based on their priority.</p>
                     </div>
                     </Popover>
                 </div>
-            </div>
-            <div class="flex justify-end items-center">
-            <ArrowDownToBracketOutline class="w-3.5 h-3.5" />
-            <Tooltip>Download CSV</Tooltip>
             </div>
         </div>
         
@@ -253,18 +249,14 @@
             <div class="flex-col items-center">
                 <div class="flex items-center mb-1">
                     <h5 class="text-xl font-bold text-gray-900 dark:text-white me-1">Progress Trend</h5>
-                    <InfoCircleSolid id="donut1" class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white cursor-pointer ms-1" />
-                    <Popover triggeredBy="#donut1" class="text-sm text-gray-500 bg-white border border-gray-200 rounded-lg shadow-xs w-72 dark:bg-gray-800">
+                    <InfoCircleSolid id="donut2" class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white cursor-pointer ms-1" />
+                    <Popover triggeredBy="#donut2" class="text-sm text-gray-500 bg-white border border-gray-200 rounded-lg shadow-xs w-72 dark:bg-gray-800">
                     <div class="p-3 space-y-2">
-                        <h3 class="font-semibold text-gray-900 dark:text-white">Progress Overview</h3>
-                        <p>This report shows the progress breakdown of tasks over the selected period.</p>
+                        <h3 class="font-semibold text-gray-900 dark:text-white">Progress Trend</h3>
+                        <p>This report shows the progress trend over the selected period.</p>
                     </div>
                     </Popover>
                 </div>
-            </div>
-            <div class="flex justify-end items-center">
-            <ArrowDownToBracketOutline class="w-3.5 h-3.5" />
-            <Tooltip>Download CSV</Tooltip>
             </div>
         </div>
         <div class="mt-6 p-4 bg-gray-800 rounded-xl text-white shadow">
@@ -278,38 +270,46 @@
     </Card>
     
     <Card>
-        <div class="flex justify-between items-start w-full">
-            <div class="flex-col items-center">
-                <div class="flex items-center mb-1">
-                    <h5 class="text-xl font-bold text-gray-900 dark:text-white me-1">Latest Tasks</h5>
-                    <InfoCircleSolid id="donut1" class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white cursor-pointer ms-1" />
-                    <Popover triggeredBy="#donut1" class="text-sm text-gray-500 bg-white border border-gray-200 rounded-lg shadow-xs w-72 dark:bg-gray-800">
-                    <div class="p-3 space-y-2">
-                        <h3 class="font-semibold text-gray-900 dark:text-white">Progress Overview</h3>
-                        <p>This report shows the progress breakdown of tasks over the selected period.</p>
-                    </div>
-                    </Popover>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center w-full gap-2">
+          <div class="flex-col">
+            <div class="flex items-center mb-1">
+              <h5 class="text-xl font-bold text-gray-900 dark:text-white me-1">Latest Tasks</h5>
+              <InfoCircleSolid
+                id="donut3"
+                class="w-4 h-4 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white cursor-pointer ms-1"
+              />
+              <Popover triggeredBy="#donut3" class="text-sm text-gray-500 bg-white border border-gray-200 rounded-lg shadow-xs w-72 dark:bg-gray-800">
+                <div class="p-3 space-y-2">
+                  <h3 class="font-semibold text-gray-900 dark:text-white">Latest Tasks</h3>
+                  <p>This report shows the latest tasks created or updated.</p>
                 </div>
+              </Popover>
             </div>
-            <div class="flex justify-end items-center">
-            <ArrowDownToBracketOutline class="w-3.5 h-3.5" />
-            <Tooltip>Download CSV</Tooltip>
-            </div>
+          </div>
         </div>
-        <div class="mt-6 p-4 bg-gray-800 rounded-xl text-white shadow">
-          <div class="text-md font-semibold mb-2">📝 Latest Tasks</div>
+      
+        <div class="mt-6 p-4 bg-gray-800 rounded-xl text-white shadow space-y-3">
+          <div class="text-md font-semibold flex items-center gap-2">
+            📝 Latest Tasks
+            <span class="text-xs font-normal text-gray-400">(Last updated just now)</span>
+          </div>
           <ul class="space-y-1 text-sm text-gray-300">
             {#each latestTasks as task}
-                <li>
-                • {task.title} – 
-                <span class={task.priority === 1 ? 'text-red-400' : task.priority === 2 ? 'text-yellow-400' : 'text-green-400'}>
-                    {PRIORITY_MAP[task.priority]}
+              <li class="hover:bg-gray-700 px-2 py-1 rounded-md transition flex justify-between items-center">
+                <span>{task.title}</span>
+                <span
+                  class={`text-xs font-medium px-2 py-0.5 rounded-full
+                    ${task.priority === 1 ? 'bg-red-500/20 text-red-400' :
+                      task.priority === 2 ? 'bg-yellow-500/20 text-yellow-300' :
+                      'bg-green-500/20 text-green-300'}`}
+                >
+                  {PRIORITY_MAP[task.priority]}
                 </span>
-                </li>
+              </li>
             {/each}
           </ul>
         </div>
-    </Card>
+    </Card>      
 </section>
   
   

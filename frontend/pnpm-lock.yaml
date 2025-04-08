@@ -26,9 +26,6 @@ importers:
       flowbite-svelte:
         specifier: ^0.48.4
         version: 0.48.4(rollup@4.37.0)(svelte@5.25.3)
-      svelte-apexcharts:
-        specifier: ^1.0.2
-        version: 1.0.2(apexcharts@4.5.0)
       tailwind-merge:
         specifier: ^3.0.2
         version: 3.0.2
@@ -1945,11 +1942,6 @@ packages:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
 
-  svelte-apexcharts@1.0.2:
-    resolution: {integrity: sha512-6qlx4rE+XsonZ0FZudfwqOQ34Pq+3wpxgAD75zgEmGoYhYBJcwmikTuTf3o8ZBsZue9U/pAwhNy3ed1Bkq1gmA==}
-    peerDependencies:
-      apexcharts: ^3.19.2
-
   svelte-check@4.1.5:
     resolution: {integrity: sha512-Gb0T2IqBNe1tLB9EB1Qh+LOe+JB8wt2/rNBDGvkxQVvk8vNeAoG+vZgFB/3P5+zC7RWlyBlzm9dVjZFph/maIg==}
     engines: {node: '>= 18.0.0'}
@@ -3654,10 +3646,6 @@ snapshots:
       has-flag: 4.0.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
-
-  svelte-apexcharts@1.0.2(apexcharts@4.5.0):
-    dependencies:
-      apexcharts: 4.5.0
 
   svelte-check@4.1.5(picomatch@4.0.2)(svelte@5.25.3)(typescript@5.8.2):
     dependencies:

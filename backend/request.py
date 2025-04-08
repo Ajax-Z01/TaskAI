@@ -37,36 +37,71 @@ else:
 
 tasks = [
     {
-        "title": "Submit laporan proyek",
-        "description": "Deadline hari ini pukul 23:59",
+        "title": "Desain halaman Task Detail",
+        "description": "Buat layout halaman detail tugas menggunakan Svelte + Flowbite-Svelte",
+        "priority": 2,
+        "status": "In Progress",
+        "progress": 60
+    },
+    {
+        "title": "Implementasi fitur komentar",
+        "description": "Tambahkan fitur komentar untuk setiap task, terhubung ke user",
         "priority": 1,
         "status": "Completed",
         "progress": 100
     },
     {
-        "title": "Kerjakan tugas desain UI",
-        "description": "Perlu diselesaikan minggu depan",
-        "priority": 3,
-        "status": "In Progress",
-        "progress": 50
+        "title": "Fitur upload lampiran",
+        "description": "Pengguna dapat mengunggah file pada halaman detail task",
+        "priority": 1,
+        "status": "Completed",
+        "progress": 100
     },
     {
-        "title": "Update dokumentasi API",
-        "description": "Tambahkan endpoint terbaru",
-        "priority": 2,
+        "title": "Halaman Settings",
+        "description": "Desain UI halaman pengaturan seperti tema, bahasa, dan akun",
+        "priority": 3,
         "status": "Pending",
         "progress": 0
     },
     {
-        "title": "Fix bug di backend",
-        "description": "Bug di login menyebabkan error 500",
-        "priority": 1,
+        "title": "Laporan Statistik Tugas",
+        "description": "Tampilkan grafik tren, jumlah tugas per status, dan tugas terbaru",
+        "priority": 2,
         "status": "In Progress",
-        "progress": 75
+        "progress": 40
     },
     {
-        "title": "Rapat dengan tim",
-        "description": "Diskusi roadmap produk untuk Q2",
+        "title": "Integrasi backend FastAPI",
+        "description": "Hubungkan frontend dengan API FastAPI untuk mengambil data task",
+        "priority": 1,
+        "status": "Completed",
+        "progress": 100
+    },
+    {
+        "title": "Model User dan relasi komentar",
+        "description": "Tambahkan model User di backend dan hubungkan ke komentar",
+        "priority": 2,
+        "status": "Completed",
+        "progress": 100
+    },
+    {
+        "title": "Optimasi performa API",
+        "description": "Tambahkan pagination dan filter di endpoint tasks",
+        "priority": 3,
+        "status": "Pending",
+        "progress": 0
+    },
+    {
+        "title": "Autentikasi User",
+        "description": "Tambahkan autentikasi berbasis token JWT di backend",
+        "priority": 1,
+        "status": "In Progress",
+        "progress": 30
+    },
+    {
+        "title": "Deploy TaskAI ke server",
+        "description": "Siapkan deployment untuk backend dan frontend TaskAI",
         "priority": 2,
         "status": "Pending",
         "progress": 0
